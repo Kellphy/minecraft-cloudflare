@@ -1,12 +1,6 @@
 import config from "@/utils/config";
 import logger from "@/utils/log";
 import Cloudflare from "cloudflare";
-import { APIPromise } from "cloudflare/core";
-
-interface DnsManagementResult
-  extends APIPromise<Cloudflare.DNS.Records.Record> {
-  zone_name: string; // Force the presence of zone_name
-}
 
 const {
   CLOUDFLARE_API_KEY,
@@ -59,11 +53,12 @@ const updateDns = async (ngrokUrl: string) => {
       logger("Creating new DNS record");
       dnsManagementResult = cloudflare.dns.records.create(cloudflareRecord);
     }
-    const { zone_name } =
-      (await dnsManagementResult) as unknown as DnsManagementResult;
+    await dnsManagementResult;
+    const zone = await cloudflare.zones.get({ zone_id: CLOUDFLARE_ZONE_ID! });
+    const zone_name = zone.name;
     logger(
       `Updated DNS record - You can now connect to ${
-        `${SUBDOMAIN_TO_UPDATE}.` || ""
+        SUBDOMAIN_TO_UPDATE ? `${SUBDOMAIN_TO_UPDATE}.` : ""
       }${zone_name} 🥳`
     );
   } catch (error) {

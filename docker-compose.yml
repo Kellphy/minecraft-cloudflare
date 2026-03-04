@@ -1,6 +1,6 @@
 services:
   minecraft-cloudflare:
-    image: alecblance/minecraft-cloudflare:1.1.1
+    image: ghcr.io/kellphy/minecraft-cloudflare:latest
     container_name: minecraft-cloudflare
     ports:
       - 5000:5000
